@@ -67,4 +67,91 @@ public class MatrixOperations {
         }
         return result;
     }
+
+    public static double calculateDeterminant(double[][] matrix) {
+        int n = matrix.length;
+
+        if (n != matrix[0].length) {
+            throw new IllegalArgumentException("The matrix is not quadratic.");
+        }
+
+        if (n == 1) {
+            return matrix[0][0];
+        }
+
+        double determinant = 0;
+
+        for (int j = 0; j < n; j++) {
+            determinant += matrix[0][j] * calculateMinor(matrix, 0, j);
+        }
+
+        return determinant;
+    }
+
+    private static double calculateMinor(double[][] matrix, int row, int column) {
+        int n = matrix.length;
+        double[][] minor = new double[n - 1][n - 1];
+
+        int minorRow = 0;
+        int minorColumn = 0;
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i != row && j != column) {
+                    minor[minorRow][minorColumn++] = matrix[i][j];
+
+                    if (minorColumn == n - 1) {
+                        minorRow++;
+                        minorColumn = 0;
+                    }
+                }
+            }
+        }
+
+        return Math.pow(-1, row + column) * calculateDeterminant(minor);
+    }
+
+    public static double[][] calculateInverseMatrix(double[][] matrix) {
+        double determinant = calculateDeterminant(matrix);
+
+        if (determinant == 0) {
+            throw new IllegalArgumentException("The matrix doesn't have an inverse.");
+        }
+
+        int n = matrix.length;
+        double[][] inverseMatrix = new double[n][n];
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                double cofactor = calculateMinor(matrix, i, j);
+                inverseMatrix[j][i] = cofactor / determinant;
+            }
+        }
+
+        return inverseMatrix;
+    }
+
+    public static boolean isIdentityMatrix(double[][] matrix) {
+        int n = matrix.length;
+
+        if (n != matrix[0].length) {
+            return false;
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    if (matrix[i][j] != 1) {
+                        return false;
+                    }
+                } else {
+                    if (matrix[i][j] != 0) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
 }
